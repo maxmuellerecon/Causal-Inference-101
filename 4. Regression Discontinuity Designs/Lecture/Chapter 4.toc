@@ -1,0 +1,2 @@
+\beamer@sectionintoc {1}{Minimum Legal Drinking Age}{4}{0}{1}
+\beamer@sectionintoc {2}{Cut off difference}{13}{0}{2}

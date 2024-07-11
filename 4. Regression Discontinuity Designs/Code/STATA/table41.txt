@@ -1,0 +1,13 @@
+	(1)
+VARIABLES	all
+	
+age	-0.97
+	(0.66)
+over21	7.66
+	(1.51)
+Constant	91.84
+	(0.71)
+	
+Observations	48
+R-squared	0.595
+Robust standard errors in parentheses	

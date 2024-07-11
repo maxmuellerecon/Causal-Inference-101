@@ -1,0 +1,18 @@
+	(1)	(2)
+VARIABLES	Model 1	Model 2
+		
+treated	13.83***	13.82***
+	(2.115)	(2.019)
+boy		-13.80***
+		(1.853)
+freelunk		-39.10***
+		(1.857)
+totexpk		1.183***
+		(0.161)
+Constant	918.2***	933.2***
+	(1.161)	(2.364)
+		
+Observations	5,749	5,749
+R-squared	0.007	0.098
+Standard errors in parentheses		
+*** p<0.01, ** p<0.05, * p<0.1		

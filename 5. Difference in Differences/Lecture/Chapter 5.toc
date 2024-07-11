@@ -1,0 +1,5 @@
+\beamer@sectionintoc {1}{Differences-in-Differences}{4}{0}{1}
+\beamer@sectionintoc {2}{DiD and banks}{6}{0}{2}
+\beamer@sectionintoc {3}{DiD on the MLDA}{21}{0}{3}
+\beamer@sectionintoc {4}{In a nutshell}{35}{0}{4}
+\beamer@sectionintoc {5}{Appendix}{36}{0}{5}

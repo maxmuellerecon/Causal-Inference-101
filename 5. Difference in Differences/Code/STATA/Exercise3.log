@@ -1,0 +1,831 @@
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 3\STATA\Exercise3.log
+  log type:  text
+ opened on:   9 Jun 2022, 14:44:26
+
+. 
+. /*
+> Card & Krueger 1994
+> 
+> On April 1, 1992, New Jersey's minimum wage rose from
+> $4.25 to $5.05 per hour. To evaluate the impact of the law
+> we surveyed 410 fast-food restaurants in New Jersey and
+> Eastern Pennsylvania before and after the rise. Comparisons
+> of employment growth at stores in New Jersey and
+> Pennsylvania (where the minimum wage was constant)
+> provide simple estimates of the effect of the higher
+> minimum wage. We also compare employment changes at
+> stores in New Jersey that were initially paying high wages
+> (above $5) to the changes at lower-wage stores. We find no
+> indication that the rise in the minimum wage reduced
+> employment */
+. 
+. 
+. 
+. *0.Install Package*****************************************************************************
+. 
+. ssc install xml_tab
+checking xml_tab consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. ssc install outreg2
+checking outreg2 consistency and verifying not already installed...
+all files already exist and are up to date.
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. 
+. cd "C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 3\STATA"
+C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 3\STATA
+
+. use card_krueger
+
+. count
+  410
+
+. *Note: 410 restaurants, which corresponds to 473 contacted ones, of which 410 replied in wave one and only 409 in wave 2!
+. ****************************************************************************/
+. 
+. *Relabel Status variable
+. #delimit ;  //set delimiter for multi column lines
+delimiter now ;
+. label define statusLab
+> 5 "Temporary closed: Fire"
+> 4 "Temporary closed: Construcion"
+> 3 "Closed"
+> 2 "Under rennovation"
+> 1 "Interviewed"
+> 0 "Refused";
+
+.  #delimit cr
+delimiter now cr
+. label val status2 statusLab
+
+. 
+. *Replicate Second Part of Table 1 from the paper
+. count
+  410
+
+. tabulate status2
+
+                      status2 |      Freq.     Percent        Cum.
+------------------------------+-----------------------------------
+                      Refused |          1        0.24        0.24
+                  Interviewed |        399       97.32       97.56
+            Under rennovation |          2        0.49       98.05
+                       Closed |          6        1.46       99.51
+Temporary closed: Construcion |          1        0.24       99.76
+       Temporary closed: Fire |          1        0.24      100.00
+------------------------------+-----------------------------------
+                        Total |        410      100.00
+
+. tab status2 state
+
+                      |    1= New Jersey;
+                      |    0=Pennsylvania
+              status2 |         0          1 |     Total
+----------------------+----------------------+----------
+              Refused |         0          1 |         1 
+          Interviewed |        78        321 |       399 
+    Under rennovation |         0          2 |         2 
+               Closed |         1          5 |         6 
+Temporary closed: Con |         0          1 |         1 
+Temporary closed: Fir |         0          1 |         1 
+----------------------+----------------------+----------
+                Total |        79        331 |       410 
+
+. 
+. *Relabel Chain variable and check how many restaurants of each chain were involved
+. label define ChainLab 4 "Wendy's" 3 "Roy Rogers" 2 "KFC" 1 "Burger King"
+
+. label val chain ChainLab
+
+. 
+. bysort state: tab chain
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> state = 0
+
+  Chain the |
+      store |
+ belongs to |      Freq.     Percent        Cum.
+------------+-----------------------------------
+Burger King |         35       44.30       44.30
+        KFC |         12       15.19       59.49
+ Roy Rogers |         17       21.52       81.01
+    Wendy's |         15       18.99      100.00
+------------+-----------------------------------
+      Total |         79      100.00
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> state = 1
+
+  Chain the |
+      store |
+ belongs to |      Freq.     Percent        Cum.
+------------+-----------------------------------
+Burger King |        136       41.09       41.09
+        KFC |         68       20.54       61.63
+ Roy Rogers |         82       24.77       86.40
+    Wendy's |         45       13.60      100.00
+------------+-----------------------------------
+      Total |        331      100.00
+
+
+. ********************************************************************************
+. 
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. 
+. ********************************************************************************
+. ***2. Replication of Summary statistics (Table 2)
+. 
+. *overall summary statistics
+. summarize fte1 fte2 wage_st wage_st2
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        fte1 |        398    20.99887    9.749805          5         85
+        fte2 |        396    21.05429    9.094453          0       60.5
+     wage_st |        390    4.615641    .3470151       4.25       5.75
+    wage_st2 |        389    4.996273    .2531905       4.25       6.25
+
+. bysort state: sum fte1 percentft1 wage_st fte2 percentft2 wage_st2, sep(0)
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> state = 0
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        fte1 |         77    23.33117    11.85628        7.5       70.5
+  percentft1 |         77     .350378    .2393325          0   .9036145
+     wage_st |         76    4.630132    .3516873       4.25        5.5
+        fte2 |         77    21.16558    8.276732          0       43.5
+  percentft2 |         76    .3038485    .2446278          0   .8484849
+    wage_st2 |         71    4.617465    .3574781       4.25       6.25
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> state = 1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        fte1 |        321    20.43941    9.106239          5         85
+  percentft1 |        321    .3284887    .2375026          0   .7894737
+     wage_st |        314    4.612134    .3463505       4.25       5.75
+        fte2 |        319    21.02743    9.293024          0       60.5
+  percentft2 |        314    .3586555    .2445354          0   .8253968
+    wage_st2 |        318    5.080849    .1045445          5       5.75
+
+
+. 
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. *Replicate Second Part of Table 1 from the paper
+. count
+  410
+
+. tabulate status2
+
+                      status2 |      Freq.     Percent        Cum.
+------------------------------+-----------------------------------
+                      Refused |          1        0.24        0.24
+                  Interviewed |        399       97.32       97.56
+            Under rennovation |          2        0.49       98.05
+                       Closed |          6        1.46       99.51
+Temporary closed: Construcion |          1        0.24       99.76
+       Temporary closed: Fire |          1        0.24      100.00
+------------------------------+-----------------------------------
+                        Total |        410      100.00
+
+. tab status2 state
+
+                      |    1= New Jersey;
+                      |    0=Pennsylvania
+              status2 |         0          1 |     Total
+----------------------+----------------------+----------
+              Refused |         0          1 |         1 
+          Interviewed |        78        321 |       399 
+    Under rennovation |         0          2 |         2 
+               Closed |         1          5 |         6 
+Temporary closed: Con |         0          1 |         1 
+Temporary closed: Fir |         0          1 |         1 
+----------------------+----------------------+----------
+                Total |        79        331 |       410 
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. ttest fte1, by(state)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |      77    23.33117    1.351149    11.85628    20.64012    26.02222
+       1 |     321    20.43941    .5082607    9.106239    19.43945    21.43936
+---------+--------------------------------------------------------------------
+Combined |     398    20.99887    .4887136    9.749805    20.03808    21.95966
+---------+--------------------------------------------------------------------
+    diff |            2.891761    1.230207                .4732069    5.310315
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t =   2.3506
+H0: diff = 0                                     Degrees of freedom =      396
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.9904         Pr(|T| > |t|) = 0.0192          Pr(T > t) = 0.0096
+
+. scalar define fte1_PA=r(mu_1)
+
+. scalar define fte1_NJ=r(mu_2)
+
+. scalar define fte1_t=r(t)
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. ttest fte2, by(state)
+
+Two-sample t test with equal variances
+----------------------------------------------------------------------
+> --------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. i
+> nterval]
+---------+------------------------------------------------------------
+> --------
+       0 |      77    21.16558    .9432212    8.276732      19.287    
+> 23.04417
+       1 |     319    21.02743    .5203094    9.293024    20.00375    
+> 22.05111
+---------+------------------------------------------------------------
+> --------
+Combined |     396    21.05429    .4570134    9.094453    20.15581    
+> 21.95278
+---------+------------------------------------------------------------
+> --------
+    diff |            .1381549    1.156182               -2.134902    
+> 2.411212
+----------------------------------------------------------------------
+> --------
+    diff = mean(0) - mean(1)                                      t = 
+>   0.1195
+H0: diff = 0                                     Degrees of freedom = 
+>      394
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: dif
+> f > 0
+ Pr(T < t) = 0.5475         Pr(|T| > |t|) = 0.9049          Pr(T > t) 
+> = 0.4525
+
+. scalar define fte2_PA=r(mu_1)
+
+. scalar define fte2_NJ=r(mu_2)
+
+. scalar define fte2_t=r(t)
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. 
+. *Do the same for the starting wage
+. ttest wage_st, by(state)
+
+Two-sample t test with equal variances
+----------------------------------------------------------------------
+> --------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. i
+> nterval]
+---------+------------------------------------------------------------
+> --------
+       0 |      76    4.630132    .0403413    .3516873    4.549768    
+> 4.710496
+       1 |     314    4.612134    .0195457    .3463505    4.573676    
+> 4.650591
+---------+------------------------------------------------------------
+> --------
+Combined |     390    4.615641    .0175718    .3470151    4.581093    
+> 4.650189
+---------+------------------------------------------------------------
+> --------
+    diff |            .0179978    .0444095               -.0693156    
+> .1053113
+----------------------------------------------------------------------
+> --------
+    diff = mean(0) - mean(1)                                      t = 
+>   0.4053
+H0: diff = 0                                     Degrees of freedom = 
+>      388
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: dif
+> f > 0
+ Pr(T < t) = 0.6572         Pr(|T| > |t|) = 0.6855          Pr(T > t) 
+> = 0.3428
+
+. scalar define wage_st1_PA=r(mu_1)
+
+. scalar define wage_st1_NJ=r(mu_2)
+
+. scalar define wage_st1_t=r(t)
+
+. 
+. ttest wage_st2, by(state)
+
+Two-sample t test with equal variances
+----------------------------------------------------------------------
+> --------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. i
+> nterval]
+---------+------------------------------------------------------------
+> --------
+       0 |      71    4.617465    .0424249    .3574781    4.532851    
+> 4.702078
+       1 |     318    5.080849    .0058626    .1045445    5.069315    
+> 5.092384
+---------+------------------------------------------------------------
+> --------
+Combined |     389    4.996273    .0128373    .2531905    4.971033    
+> 5.021512
+---------+------------------------------------------------------------
+> --------
+    diff |           -.4633844    .0235051               -.5095982   -
+> .4171707
+----------------------------------------------------------------------
+> --------
+    diff = mean(0) - mean(1)                                      t = 
+> -19.7142
+H0: diff = 0                                     Degrees of freedom = 
+>      387
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: dif
+> f > 0
+ Pr(T < t) = 0.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) 
+> = 1.0000
+
+. scalar define wage_st2_PA=r(mu_1)
+
+. scalar define wage_st2_NJ=r(mu_2)
+
+. scalar define wage_st2_t=r(t)
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. 
+. *Create table 2
+. #delimit ;
+delimiter now ;
+. matrix define table2=[fte1_PA, fte1_NJ, fte1_t \
+> wage_st1_PA, wage_st1_NJ, wage_st1_t \
+> fte2_PA, fte2_NJ, fte2_t \
+> wage_st2_PA, wage_st2_NJ, wage_st2_t 
+> ] ;
+
+. matrix colnames table2= "PA" "NJ" "t-test" ;
+
+. matrix rownames table2= "Fulltime Employment Wave1" "Starting Wages 
+> Wave1" "Fulltime Employment Wave 2" "Starting Wages Wave 2" ;
+
+. #delimit cr
+delimiter now cr
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. matrix list table2
+
+table2[4,3]
+                      PA          NJ      t-test
+Fulltime E~1   23.331169   20.439408   2.3506289
+Starting W~1   4.6301316   4.6121337   .40526953
+Fulltime E~2   21.165584   21.027429   .11949244
+Starting W~2   4.6174648   5.0808492  -19.714182
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. 
+. ttest wage_st2, by(state)
+
+Two-sample t test with equal variances
+----------------------------------------------------------------------
+> --------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. i
+> nterval]
+---------+------------------------------------------------------------
+> --------
+       0 |      71    4.617465    .0424249    .3574781    4.532851    
+> 4.702078
+       1 |     318    5.080849    .0058626    .1045445    5.069315    
+> 5.092384
+---------+------------------------------------------------------------
+> --------
+Combined |     389    4.996273    .0128373    .2531905    4.971033    
+> 5.021512
+---------+------------------------------------------------------------
+> --------
+    diff |           -.4633844    .0235051               -.5095982   -
+> .4171707
+----------------------------------------------------------------------
+> --------
+    diff = mean(0) - mean(1)                                      t = 
+> -19.7142
+H0: diff = 0                                     Degrees of freedom = 
+>      387
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: dif
+> f > 0
+ Pr(T < t) = 0.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) 
+> = 1.0000
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. 
+. ttest wage_st2, by(state)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |      71    4.617465    .0424249    .3574781    4.532851    4.702078
+       1 |     318    5.080849    .0058626    .1045445    5.069315    5.092384
+---------+--------------------------------------------------------------------
+Combined |     389    4.996273    .0128373    .2531905    4.971033    5.021512
+---------+--------------------------------------------------------------------
+    diff |           -.4633844    .0235051               -.5095982   -.4171707
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t = -19.7142
+H0: diff = 0                                     Degrees of freedom =      387
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) = 1.0000
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. xml_tab table2, save(table2.xls) replace
+
+
+note: results saved to C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 3\STATA/table
+> 2.xls
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. 
+. 
+. *3. Graph******************************************************************
+. histogram wage_st, by(state)
+
+. twoway (histogram wage_st if state==0, color(red%30) bin(20)) (histogram wage_st if st
+> ate==1,color(blue%30) bin(20)), legend(order(1 "Pennsylvania" 2 "New Jersey")) title("
+> DISTRIBUTION OF STARTING WAGE RATES") 
+
+. twoway (histogram wage_st2 if state==0, color(red%30) bin(20)) (histogram wage_st2 if 
+> state==1,color(blue%30) bin(20)), legend(order(1 "Pennsylvania" 2 "New Jersey")) title
+> ("DISTRIBUTION OF STARTING WAGE RATES") 
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. twoway (histogram wage_st if state==0, color(red%30) bin(20)) (histogram wage_st if st
+> ate==1,color(blue%30) bin(20)), legend(order(1 "Pennsylvania" 2 "New Jersey")) title("
+> DISTRIBUTION OF STARTING WAGE RATES") 
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. 
+. *4. Diff and Diff (Table 3)******************************************************
+. ***Inter state differences 
+. *Save means, standard deviations and differences (Ttest with assumption of unequal var
+> iances)
+. *Wave 1
+. ci means fte1 if state==0
+
+    Variable |        Obs        Mean    Std. err.       [95% conf. interval]
+-------------+---------------------------------------------------------------
+        fte1 |         77    23.33117    1.351149        20.64012    26.02222
+
+. scalar define m_fte1_PA=r(mean)
+
+. scalar define se_fte1_PA=r(se)
+
+. 
+. ci means fte1 if state==1
+
+    Variable |        Obs        Mean    Std. err.       [95% conf. interval]
+-------------+---------------------------------------------------------------
+        fte1 |        321    20.43941    .5082607        19.43945    21.43936
+
+. scalar define m_fte1_NJ=r(mean)
+
+. scalar define se_fte1_NJ=r(se)
+
+. 
+. 
+. ttest fte1, by(state) unequal
+
+Two-sample t test with unequal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |      77    23.33117    1.351149    11.85628    20.64012    26.02222
+       1 |     321    20.43941    .5082607    9.106239    19.43945    21.43936
+---------+--------------------------------------------------------------------
+Combined |     398    20.99887    .4887136    9.749805    20.03808    21.95966
+---------+--------------------------------------------------------------------
+    diff |            2.891761    1.443583                 .027221      5.7563
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t =   2.0032
+H0: diff = 0                     Satterthwaite's degrees of freedom =  98.5616
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.9760         Pr(|T| > |t|) = 0.0479          Pr(T > t) = 0.0240
+
+. scalar define d_fte1=m_fte1_NJ-m_fte1_PA
+
+. scalar define se_fte1=r(se)
+
+. 
+. *Wave 2
+. ci means fte2 if state==0
+
+    Variable |        Obs        Mean    Std. err.       [95% conf. interval]
+-------------+---------------------------------------------------------------
+        fte2 |         77    21.16558    .9432212          19.287    23.04417
+
+. scalar define m_fte2_PA=r(mean)
+
+. scalar define se_fte2_PA=r(se)
+
+. 
+. ci means fte2 if state==1
+
+    Variable |        Obs        Mean    Std. err.       [95% conf. interval]
+-------------+---------------------------------------------------------------
+        fte2 |        319    21.02743    .5203094        20.00375    22.05111
+
+. scalar define m_fte2_NJ=r(mean)
+
+. scalar define se_fte2_NJ=r(se)
+
+. 
+. ttest fte2, by(state) unequal
+
+Two-sample t test with unequal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       0 |      77    21.16558    .9432212    8.276732      19.287    23.04417
+       1 |     319    21.02743    .5203094    9.293024    20.00375    22.05111
+---------+--------------------------------------------------------------------
+Combined |     396    21.05429    .4570134    9.094453    20.15581    21.95278
+---------+--------------------------------------------------------------------
+    diff |            .1381549    1.077213               -1.993538    2.269848
+------------------------------------------------------------------------------
+    diff = mean(0) - mean(1)                                      t =   0.1283
+H0: diff = 0                     Satterthwaite's degrees of freedom =  126.491
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.5509         Pr(|T| > |t|) = 0.8982          Pr(T > t) = 0.4491
+
+. scalar define d_fte2=m_fte2_NJ-m_fte2_PA
+
+. scalar define se_fte2=r(se)
+
+. 
+. 
+. ***Difference within states between years
+. *Save means, standard deviations and differences (Ttest with assumption of unequal var
+> iances)
+. *PA
+. preserve
+
+. keep if state==0
+(331 observations deleted)
+
+. ttest fte1=fte2
+
+Paired t test
+------------------------------------------------------------------------------
+Variable |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+    fte1 |      75       23.38    1.386846    12.01044    20.61665    26.14335
+    fte2 |      75    21.09667    .9671623    8.375872    19.16955    23.02378
+---------+--------------------------------------------------------------------
+    diff |      75    2.283333    1.253269    10.85363   -.2138597    4.780526
+------------------------------------------------------------------------------
+     mean(diff) = mean(fte1 - fte2)                               t =   1.8219
+ H0: mean(diff) = 0                              Degrees of freedom =       74
+
+ Ha: mean(diff) < 0           Ha: mean(diff) != 0           Ha: mean(diff) > 0
+ Pr(T < t) = 0.9637         Pr(|T| > |t|) = 0.0725          Pr(T > t) = 0.0363
+
+. scalar define d_fte_PA=m_fte2_PA-m_fte1_PA
+
+. scalar define se_fte_PA=r(se)
+
+. restore
+
+. 
+. ***NJ
+. preserve
+
+. keep if state==1
+(79 observations deleted)
+
+. ttest fte1=fte2
+
+Paired t test
+------------------------------------------------------------------------------
+Variable |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+    fte1 |     309    20.43058    .5240994    9.212827    19.39931    21.46185
+    fte2 |     309    20.89725    .5336943    9.381489     19.8471     21.9474
+---------+--------------------------------------------------------------------
+    diff |     309   -.4666667    .4808286    8.452195   -1.412791    .4794578
+------------------------------------------------------------------------------
+     mean(diff) = mean(fte1 - fte2)                               t =  -0.9705
+ H0: mean(diff) = 0                              Degrees of freedom =      308
+
+ Ha: mean(diff) < 0           Ha: mean(diff) != 0           Ha: mean(diff) > 0
+ Pr(T < t) = 0.1663         Pr(|T| > |t|) = 0.3325          Pr(T > t) = 0.8337
+
+. scalar define d_fte_NJ=m_fte2_NJ-m_fte1_NJ
+
+. scalar define se_fte_NJ=r(se)
+
+. restore
+
+. 
+. 
+. *** DiD
+. scalar define dd=d_fte_NJ-d_fte_PA
+
+. scalar se_dd=1.36
+
+. scalar list 
+     se_dd =       1.36
+        dd =  2.7536058
+ se_fte_NJ =  .48082857
+  d_fte_NJ =  .58802137
+ se_fte_PA =   1.253269
+  d_fte_PA = -2.1655844
+   se_fte2 =  1.0772131
+    d_fte2 = -.13815495
+se_fte2_NJ =  .52030944
+ m_fte2_NJ =  21.027429
+se_fte2_PA =  .94322116
+ m_fte2_PA =  21.165584
+   se_fte1 =  1.4435831
+    d_fte1 = -2.8917607
+se_fte1_NJ =   .5082607
+ m_fte1_NJ =  20.439408
+se_fte1_PA =  1.3511489
+ m_fte1_PA =  23.331169
+wage_st2_t = -19.714182
+wage_st2_NJ =  5.0808492
+wage_st2_PA =  4.6174648
+wage_st1_t =  .40526953
+wage_st1_NJ =  4.6121337
+wage_st1_PA =  4.6301316
+    fte2_t =  .11949244
+   fte2_NJ =  21.027429
+   fte2_PA =  21.165584
+    fte1_t =  2.3506289
+   fte1_NJ =  20.439408
+   fte1_PA =  23.331169
+
+. 
+. *Create table 3
+. #delimit ;
+delimiter now ;
+. matrix define table3=[m_fte1_PA, m_fte1_NJ, d_fte1 \
+> se_fte1_PA, se_fte1_NJ, se_fte1 \
+> m_fte2_PA, m_fte2_NJ, d_fte2 \
+> se_fte2_PA, se_fte2_NJ, se_fte2 \
+> d_fte_PA, d_fte_NJ, dd\
+> se_fte_PA, se_fte_NJ, se_dd
+> ] ;
+
+. matrix colnames table3= "PA" "NJ" "State difference" ;
+
+. matrix rownames table3= "Wave 1- Mean" "Wave 1- Standard error"  "Wave 2 - Mean" "Wave
+>  2 - Standard error" "Period difference - Mean"  "Period difference - SE" ;
+
+. #delimit cr
+delimiter now cr
+. 
+. matrix list table3
+
+table3[6,3]
+                        PA            NJ  State diff~e
+Wave 1- Mean     23.331169     20.439408    -2.8917607
+Wave 1- St~r     1.3511489      .5082607     1.4435831
+Wave 2 - M~n     21.165584     21.027429    -.13815495
+Wave 2 - S~r     .94322116     .52030944     1.0772131
+Period dif~n    -2.1655844     .58802137     2.7536058
+Period dif~E      1.253269     .48082857          1.36
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. 
+. 
+. **************************************************************
+. ***5. OLS - Regressions with either Dummies for the State (Table 4)
+. use cardkrueger_long, clear
+
+. 
+. *Replace periodic values to perform diff-in-diff
+. replace period=0 if period==1
+(409 real changes made)
+
+. replace period=1 if period==2
+(409 real changes made)
+
+. 
+. *Generate interaction term for diff in diff design
+. gen reform=state*period
+
+. 
+. *Regression Without controls
+. reg fte state period reform
+
+      Source |       SS           df       MS      Number of obs   =       792
+-------------+----------------------------------   F(3, 788)       =      1.92
+       Model |  510.925286         3  170.308429   Prob > F        =    0.1243
+    Residual |  69773.6905       788  88.5452925   R-squared       =    0.0073
+-------------+----------------------------------   Adj R-squared   =    0.0035
+       Total |  70284.6157       791  88.8553928   Root MSE        =    9.4099
+
+------------------------------------------------------------------------------
+         fte | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       state |  -2.865388   1.194422    -2.40   0.017    -5.210012   -.5207631
+      period |  -2.165584   1.516535    -1.43   0.154     -5.14251    .8113416
+      reform |   2.747759   1.689682     1.63   0.104    -.5690517     6.06457
+       _cons |   23.33117   1.072352    21.76   0.000     21.22616    25.43617
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD31d8_000000.tmp"
+
+. reg fte state period reform co_owned
+
+      Source |       SS           df       MS      Number of obs   =       792
+-------------+----------------------------------   F(4, 787)       =      4.94
+       Model |  1722.61393         4  430.653484   Prob > F        =    0.0006
+    Residual |  68562.0018       787  87.1181726   R-squared       =    0.0245
+-------------+----------------------------------   Adj R-squared   =    0.0196
+       Total |  70284.6157       791  88.8553928   Root MSE        =    9.3337
+
+------------------------------------------------------------------------------
+         fte | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+       state |  -2.917147   1.184838    -2.46   0.014    -5.242964   -.5913296
+      period |  -2.233188   1.504373    -1.48   0.138    -5.186247    .7198701
+      reform |   2.812805   1.676101     1.68   0.094    -.4773522    6.102963
+    co_owned |  -2.602754   .6978979    -3.73   0.000    -3.972715   -1.232792
+       _cons |   24.27762   1.093531    22.20   0.000     22.13104    26.42421
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. exit, clear

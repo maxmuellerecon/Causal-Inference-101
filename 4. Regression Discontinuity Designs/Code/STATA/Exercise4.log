@@ -1,0 +1,378 @@
+--------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 4\STATA\Exercise4.log
+  log type:  text
+ opened on:  23 Jun 2022, 13:27:20
+
+. 
+. // set to directory where data is located
+. cd "C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 4\STATA"
+C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 4\STATA
+
+. 
+. use mlda
+(Written by R.              )
+
+. 
+. *1. Data manipulation******************************************
+. * Create Cutoff age variable (centered age variable for easier interpretation) and dummy for over 21
+. gen age = agecell - 21
+
+. gen over21 = agecell >= 21
+
+. 
+. *Create Second order polynomial and interaction terms
+. gen age2 = age^2
+
+. gen over_age = over21*age
+
+. gen over_age2 = over21*age2
+
+. 
+. 
+. *2. Create Figures 4.2 4.4 4.5******************************************
+. * Regressions for Figure 4.2.
+. * Regress for linear trend, and linear trend on each side, predict total mortality
+. * All variable = all causes for deaths (measured as deaths per 100,000 persons per 30-day interval counting 
+> from the twenty-first birthday)
+. reg all age over21
+
+      Source |       SS           df       MS      Number of obs   =        48
+-------------+----------------------------------   F(2, 45)        =     32.99
+       Model |  410.138151         2  205.069075   Prob > F        =    0.0000
+    Residual |  279.682408        45  6.21516463   R-squared       =    0.5946
+-------------+----------------------------------   Adj R-squared   =    0.5765
+       Total |  689.820559        47  14.6770332   Root MSE        =     2.493
+
+------------------------------------------------------------------------------
+         all | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |  -.9746843   .6324613    -1.54   0.130    -2.248527    .2991581
+      over21 |   7.662709   1.440286     5.32   0.000     4.761824    10.56359
+       _cons |   91.84137   .8050394   114.08   0.000     90.21994     93.4628
+------------------------------------------------------------------------------
+
+. predict allfitlin
+(option xb assumed; fitted values)
+
+. reg all age over21 over_age
+
+      Source |       SS           df       MS      Number of obs   =        48
+-------------+----------------------------------   F(3, 44)        =     29.47
+       Model |  460.574058         3  153.524686   Prob > F        =    0.0000
+    Residual |  229.246501        44  5.21014775   R-squared       =    0.6677
+-------------+----------------------------------   Adj R-squared   =    0.6450
+       Total |  689.820559        47  14.6770332   Root MSE        =    2.2826
+
+------------------------------------------------------------------------------
+         all | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |   .8269952   .8189316     1.01   0.318     -.823453    2.477443
+      over21 |   7.662709   1.318704     5.81   0.000     5.005035    10.32038
+    over_age |  -3.603359   1.158144    -3.11   0.003    -5.937445   -1.269273
+       _cons |   93.61837   .9324647   100.40   0.000     91.73911    95.49763
+------------------------------------------------------------------------------
+
+. predict allfitlini
+(option xb assumed; fitted values)
+
+. 
+. * Figure 4.2. 
+. twoway (scatter all agecell) (line allfitlin agecell if age < 0, lcolor(black) lwidth(medthick)) ///
+> (line allfitlin agecell if age >= 0, lcolor(black red) lwidth(medthick)), legend(off)
+
+. graph export "Figure2.png", replace
+file Figure2.png saved as PNG format
+
+. 
+. 
+. * Regressions for Figure 4.4.
+. * Quadratic, and quadratic on each side
+. reg all age age2 over21
+
+      Source |       SS           df       MS      Number of obs   =        48
+-------------+----------------------------------   F(3, 44)        =     28.12
+       Model |  453.339903         3  151.113301   Prob > F        =    0.0000
+    Residual |  236.480656        44  5.37456037   R-squared       =    0.6572
+-------------+----------------------------------   Adj R-squared   =    0.6338
+       Total |  689.820559        47  14.6770332   Root MSE        =    2.3183
+
+------------------------------------------------------------------------------
+         all | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |  -.9746843   .5881378    -1.66   0.105    -2.159998    .2106296
+        age2 |  -.8186505   .2887482    -2.84   0.007    -1.400584   -.2367167
+      over21 |   7.662709   1.339349     5.72   0.000     4.963428    10.36199
+       _cons |   92.90274   .8370061   110.99   0.000     91.21587    94.58962
+------------------------------------------------------------------------------
+
+. predict allfitq
+(option xb assumed; fitted values)
+
+. reg all age age2 over21 over_age over_age2
+
+      Source |       SS           df       MS      Number of obs   =        48
+-------------+----------------------------------   F(5, 42)        =     18.02
+       Model |  470.512104         5  94.1024207   Prob > F        =    0.0000
+    Residual |  219.308455        42  5.22162989   R-squared       =    0.6821
+-------------+----------------------------------   Adj R-squared   =    0.6442
+       Total |  689.820559        47  14.6770332   Root MSE        =    2.2851
+
+------------------------------------------------------------------------------
+         all | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |  -.8305828   3.290064    -0.25   0.802    -7.470202    5.809036
+        age2 |  -.8402999   1.615268    -0.52   0.606    -4.100043    2.419443
+      over21 |   9.547789   1.985277     4.81   0.000     5.541337    13.55424
+    over_age |  -6.017014   4.652854    -1.29   0.203    -15.40685    3.372824
+   over_age2 |   2.904189   2.284334     1.27   0.211    -1.705784    7.514162
+       _cons |   93.07294   1.403803    66.30   0.000     90.23995    95.90593
+------------------------------------------------------------------------------
+
+. predict allfitqi
+(option xb assumed; fitted values)
+
+. 
+. label variable all       "Mortality rate from all causes (per 100,000)"
+
+. label variable allfitlin "Mortality rate from all causes (per 100,000)"
+
+. label variable allfitqi  "Mortality rate from all causes (per 100,000)"
+
+. 
+. * Figure 4.4.            
+. twoway (scatter all agecell) (line allfitlin allfitqi agecell if age < 0,  lcolor(red black) lwidth(medthick
+>  medthick) lpattern(dash)) ///
+>                              (line allfitlin allfitqi agecell if age >= 0, lcolor(red black) lwidth(medthick
+>  medthick) lpattern(dash)), legend(off)
+
+. graph export "Figure4.png", replace
+file Figure4.png saved as PNG format
+
+. 
+. 
+. * Regressions for Fig 4.5
+. * Regress "Motor Vehicle Accidents" on running and treatment variable (linear, and quadratic on each side) a
+> n predict mva
+. reg mva age over21
+
+      Source |       SS           df       MS      Number of obs   =        48
+-------------+----------------------------------   F(2, 45)        =     53.14
+       Model |  187.819794         2   93.909897   Prob > F        =    0.0000
+    Residual |  79.5215648        45  1.76714588   R-squared       =    0.7025
+-------------+----------------------------------   Adj R-squared   =    0.6893
+       Total |  267.341359        47  5.68811402   Root MSE        =    1.3293
+
+------------------------------------------------------------------------------
+         mva | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |  -3.148829   .3372437    -9.34   0.000    -3.828073   -2.469585
+      over21 |   4.534033   .7679953     5.90   0.000     2.987211    6.080855
+       _cons |   29.35597   .4292665    68.39   0.000     28.49138    30.22055
+------------------------------------------------------------------------------
+
+. predict exfitlin
+(option xb assumed; fitted values)
+
+. reg mva age age2 over21 over_age over_age2
+
+      Source |       SS           df       MS      Number of obs   =        48
+-------------+----------------------------------   F(5, 42)        =     21.86
+       Model |   193.13755         5    38.62751   Prob > F        =    0.0000
+    Residual |  74.2038088        42  1.76675735   R-squared       =    0.7224
+-------------+----------------------------------   Adj R-squared   =    0.6894
+       Total |  267.341359        47  5.68811402   Root MSE        =    1.3292
+
+------------------------------------------------------------------------------
+         mva | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |  -2.933014    1.91377    -1.53   0.133    -6.795159    .9291307
+        age2 |  -.1852363    .939572    -0.20   0.845    -2.081369    1.710897
+      over21 |   4.662859   1.154799     4.04   0.000     2.332379    6.993338
+    over_age |  -.8231342    2.70648    -0.30   0.763    -6.285032    4.638763
+   over_age2 |   .1984711   1.328755     0.15   0.882    -2.483066    2.880008
+       _cons |   29.80898   .8165665    36.51   0.000     28.16109    31.45688
+------------------------------------------------------------------------------
+
+. predict exfitqi
+(option xb assumed; fitted values)
+
+. 
+. *Do we need more controls? Treatment status (over21) is determined solely by age. Assuming that the effect o
+> f age on death rates is captured by a linear/quadratic function, we can be sure that no OVB afflicts this sh
+> ort regression
+. 
+. *Regress suicide on running and treatment variable and predict
+. reg suicide age over21
+
+      Source |       SS           df       MS      Number of obs   =        48
+-------------+----------------------------------   F(2, 45)        =     20.39
+       Model |  25.2717131         2  12.6358566   Prob > F        =    0.0000
+    Residual |  27.8835665        45  .619634811   R-squared       =    0.4754
+-------------+----------------------------------   Adj R-squared   =    0.4521
+       Total |  53.1552796        47   1.1309634   Root MSE        =    .78717
+
+------------------------------------------------------------------------------
+     suicide | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |  -.1814086   .1996988    -0.91   0.369    -.5836227    .2208055
+      over21 |   1.794289   .4547684     3.95   0.000     .8783385     2.71024
+       _cons |   11.45484   .2541902    45.06   0.000     10.94287     11.9668
+------------------------------------------------------------------------------
+
+. predict sufitlin
+(option xb assumed; fitted values)
+
+. reg suicide age age2 over21 over_age over_age2
+
+      Source |       SS           df       MS      Number of obs   =        48
+-------------+----------------------------------   F(5, 42)        =      8.03
+       Model |  25.9787431         5  5.19574862   Prob > F        =    0.0000
+    Residual |  27.1765365        42  .647060394   R-squared       =    0.4887
+-------------+----------------------------------   Adj R-squared   =    0.4279
+       Total |  53.1552796        47   1.1309634   Root MSE        =     .8044
+
+------------------------------------------------------------------------------
+     suicide | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |   .1382259   1.158174     0.12   0.906    -2.199064    2.475515
+        age2 |   .0555234   .5686094     0.10   0.923    -1.091977    1.203024
+      over21 |   1.814332   .6988606     2.60   0.013     .4039743     3.22469
+    over_age |  -.7001801   1.637905    -0.43   0.671    -4.005607    2.605246
+   over_age2 |   .0308786   .8041351     0.04   0.970    -1.591932    1.653689
+       _cons |   11.69811    .494169    23.67   0.000     10.70083    12.69538
+------------------------------------------------------------------------------
+
+. predict sufitqi
+(option xb assumed; fitted values)
+
+. 
+. * Regress "Internal causes" on running and treatment variable (linear, and quadratic on each side) and predi
+> ct internal causes
+. reg internal age over21
+
+      Source |       SS           df       MS      Number of obs   =        48
+-------------+----------------------------------   F(2, 45)        =     89.64
+       Model |  190.857614         2  95.4288068   Prob > F        =    0.0000
+    Residual |  47.9069341        45  1.06459854   R-squared       =    0.7994
+-------------+----------------------------------   Adj R-squared   =    0.7904
+       Total |  238.764548        47  5.08009676   Root MSE        =    1.0318
+
+------------------------------------------------------------------------------
+    internal | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |   1.600067   .2617584     6.11   0.000     1.072859    2.127275
+      over21 |   .3919185   .5960948     0.66   0.514     -.808678    1.592515
+       _cons |   20.08933   .3331837    60.30   0.000     19.41826     20.7604
+------------------------------------------------------------------------------
+
+. predict infitlin
+(option xb assumed; fitted values)
+
+. reg internal age age2 over21 over_age over_age2
+
+      Source |       SS           df       MS      Number of obs   =        48
+-------------+----------------------------------   F(5, 42)        =     35.26
+       Model |  192.829423         5  38.5658847   Prob > F        =    0.0000
+    Residual |  45.9351244        42  1.09369344   R-squared       =    0.8076
+-------------+----------------------------------   Adj R-squared   =    0.7847
+       Total |  238.764548        47  5.08009676   Root MSE        =    1.0458
+
+------------------------------------------------------------------------------
+    internal | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |   1.499653   1.505737     1.00   0.325    -1.539047    4.538354
+        age2 |  -.0601118   .7392467    -0.08   0.936    -1.551972    1.431748
+      over21 |   1.073201   .9085858     1.18   0.244    -.7603996    2.906801
+    over_age |  -1.869609   2.129434    -0.88   0.385    -6.166981    2.427762
+   over_age2 |   1.049596   1.045453     1.00   0.321    -1.060213    3.159405
+       _cons |   20.06823   .6424672    31.24   0.000     18.77168    21.36478
+------------------------------------------------------------------------------
+
+. predict infitqi
+(option xb assumed; fitted values)
+
+. 
+. *Label Variabels
+. label variable mva  "Mortality rate (per 100,000)"
+
+. label variable infitqi  "Mortality rate (per 100,000)"
+
+. label variable exfitqi  "Mortality rate (per 100,000)"
+
+. 
+. *Figure 4.5
+. twoway (scatter mva internal agecell) (line exfitqi infitqi agecell if agecell < 21) ///
+>                                        (line exfitqi infitqi agecell if agecell >= 21), ///
+>                                                                            legend(off) text(28 20.1 "Motor V
+> ehicle Fatalities") ///
+>                                                                            text(17 22 "Deaths from Internal 
+> Causes")
+
+. graph export "Figure5.png", replace
+file Figure5.png saved as PNG format
+
+. 
+. 
+. * 3.  MLDA Regression Discontinuity******************************************
+. 
+. * Generate dummy for other causes
+. gen ext_oth = external - homicide - suicide - mva
+(2 missing values generated)
+
+. 
+. /*Use smaller bandwith:
+> For the small set of points close to the boundary, nonlinear trends need not concern us at
+> all. This suggests an approach that compares averages in a narrow
+> window just to the left and just to the right of the cutoff. A drawback
+> here is that if the window is very narrow, there are few observations left,
+> meaning the resulting estimates are likely to be too imprecise to be
+> useful (harder to extrapolate). Still, we should be able to trade the reduction in bias near the
+> boundary against the increased variance suffered by throwing data
+> away, generating some kind of optimal window size.
+> --> We choose bandwith of 2 years*/
+. 
+. foreach x in all mva suicide homicide ext_oth internal alcohol {
+  2. 
+. reg `x' age over21, robust
+  3. if ("`x'"=="all"){
+  4.         outreg2 over21 using table41.xls, replace bdec(2) sdec(2) noaster excel
+  5. }
+  6. else{
+  7.         outreg2 over21 using table41.xls, append bdec(2) sdec(2) noaster excel
+  8. }
+  9. 
+. reg `x' age age2 over21 over_age over_age2, robust
+ 10. outreg2 over21 using table41.xls, append bdec(2) sdec(2) noaster excel
+ 11. 
+. reg `x' age over21 if agecell >= 20 & agecell <= 22, robust
+ 12. outreg2 over21 using table41.xls, append bdec(2) sdec(2) noaster excel
+ 13. 
+. reg `x' age age2 over21 over_age over_age2 if agecell >= 20 & agecell <= 22, robust
+ 14. outreg2 over21 using table41.xls, append bdec(2) sdec(2) noaster excel
+ 15. 
+. }
+
+Linear regression                               Number of obs     =         48
+                                                F(2, 45)          =      32.55
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.5946
+                                                Root MSE          =      2.493
+
+------------------------------------------------------------------------------
+             |               Robust
+         all | Coefficient  std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+         age |  -.9746843    .663873    -1.47   0.149    -2.311793    .3624247
+      over21 |   7.662709   1.514233     5.06   0.000     4.612886    10.71253
+       _cons |   91.84137   .7090399   129.53   0.000     90.41329    93.26945
+------------------------------------------------------------------------------
+file table41.xls is read-only; cannot be modified or erased
+The file needs to be closed if being used by another software such as Excel.
+r(608);
+
+end of do-file
+
+r(608);
+
+. exit, clear

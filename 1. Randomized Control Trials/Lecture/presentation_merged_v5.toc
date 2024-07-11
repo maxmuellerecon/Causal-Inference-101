@@ -1,0 +1,4 @@
+\beamer@sectionintoc {1}{Introduction}{4}{0}{1}
+\beamer@sectionintoc {2}{The RAND Experiment}{5}{0}{2}
+\beamer@sectionintoc {3}{The Oregon Trail}{24}{0}{3}
+\beamer@sectionintoc {4}{Appendix}{30}{0}{4}

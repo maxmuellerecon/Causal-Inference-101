@@ -1,0 +1,539 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 1\STATA\Exercise1.log
+  log type:  text
+ opened on:   2 Jun 2022, 11:10:43
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. ********************************************************************************
+. ***1. Get the data 
+. 
+. cd "C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 1\STATA"
+C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 1\STATA
+
+. use STAR
+
+. describe
+
+Contains data from STAR.dta
+ Observations:         5,749                  
+    Variables:             6                  2 Oct 2009 18:36
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+totexpk         byte    %8.0g      totexpk    years of total teaching experience - kindergarten
+schidkn         int     %8.0g      schidkn    school id-k (new) kindergarten
+tscorek         float   %9.0g                 Test Score
+sck             float   %9.0g                 Small Class
+boy             float   %9.0g                 Boy
+freelunk        float   %9.0g                 Free School Lunch
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Sorted by: 
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. describe
+
+Contains data from STAR.dta
+ Observations:         5,749                  
+    Variables:             6                  2 Oct 2009 18:36
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+totexpk         byte    %8.0g      totexpk    years of total teaching experience - kindergarten
+schidkn         int     %8.0g      schidkn    school id-k (new) kindergarten
+tscorek         float   %9.0g                 Test Score
+sck             float   %9.0g                 Small Class
+boy             float   %9.0g                 Boy
+freelunk        float   %9.0g                 Free School Lunch
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Sorted by: 
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. rename sck treated
+
+. label var treated "Treated class: max. 17 students"
+
+. tab treated
+
+    Treated |
+class: max. |
+17 students |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      4,016       69.86       69.86
+          1 |      1,733       30.14      100.00
+------------+-----------------------------------
+      Total |      5,749      100.00
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. #delimit ;  //set delimiter for multi column lines
+delimiter now ;
+. label define treatedlab
+> 1 "Class has 13-17 students"
+> 0 "Class has 22-15 students";
+
+.  #delimit cr // To restore the carriage return delimiter inside a file
+
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. label val treated treatedlab
+
+. tab treated
+
+  Treated class: max. 17 |
+                students |      Freq.     Percent        Cum.
+-------------------------+-----------------------------------
+Class has 22-15 students |      4,016       69.86       69.86
+Class has 13-17 students |      1,733       30.14      100.00
+-------------------------+-----------------------------------
+                   Total |      5,749      100.00
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. save STAR_clean, replace
+file STAR_clean.dta saved
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. tabulate treated
+
+  Treated class: max. 17 |
+                students |      Freq.     Percent        Cum.
+-------------------------+-----------------------------------
+Class has 22-15 students |      4,016       69.86       69.86
+Class has 13-17 students |      1,733       30.14      100.00
+-------------------------+-----------------------------------
+                   Total |      5,749      100.00
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. summarize tscorek
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     tscorek |      5,749    922.3928    73.87029        635       1253
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. summarize tscorek if treated==0
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     tscorek |      4,016    918.2251    72.35114        635       1253
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. summarize tscorek if treated!=0 //Difference btw treated and non treated
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     tscorek |      1,733    932.0508    76.42836        747       1253
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. bysort treated: summarize tscorek
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> treated = Class has 22-15 students
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     tscorek |      4,016    918.2251    72.35114        635       1253
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> treated = Class has 13-17 students
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+     tscorek |      1,733    932.0508    76.42836        747       1253
+
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. help table
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. table treated, statistic (mean tscorek)  statistic (sd tscorek)
+
+----------------------------------------------------------------
+                                |      Mean   Standard deviation
+--------------------------------+-------------------------------
+Treated class: max. 17 students |                               
+  Class has 22-15 students      |  918.2251             72.35114
+  Class has 13-17 students      |  932.0508             76.42836
+  Total                         |  922.3928             73.87029
+----------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. sum boy freelunk totexpk
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+         boy |      5,749    .5138285    .4998522          0          1
+    freelunk |      5,749    .4828666    .4997498          0          1
+     totexpk |      5,749    9.306662    5.767478          0         27
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. bysort treated: summarize boy freelunk totexpk
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> treated = Class has 22-15 students
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+         boy |      4,016    .5136952    .4998746          0          1
+    freelunk |      4,016    .4870518    .4998946          0          1
+     totexpk |      4,016    9.442978    5.778539          0         27
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> treated = Class has 13-17 students
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+         boy |      1,733    .5141373    .4999444          0          1
+    freelunk |      1,733    .4731679    .4994236          0          1
+     totexpk |      1,733    8.990767    5.730971          0         27
+
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. table treated, statistic (mean boy freelunk totexpk) 
+
+-------------------------------------------------------------------------------------------------------------------
+                                |       Boy   Free School Lunch   years of total teaching experience - kindergarten
+--------------------------------+----------------------------------------------------------------------------------
+Treated class: max. 17 students |                                                                                  
+  Class has 22-15 students      |  .5136952            .4870518                                            9.442978
+  Class has 13-17 students      |  .5141373            .4731679                                            8.990767
+  Total                         |  .5138285            .4828666                                            9.306662
+-------------------------------------------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. twoway (histogram totexpk, by(treated))
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. twoway (histogram totexpk, by(treated))
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. histogram totexpk, by(treated)
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. twoway (histogram totexpk if treated==0,color(blue%30)) (histogram totexpk if treated==1,color(red%30)), legend(order(1 "Non-Treated" 2 "Treated")) title("Year
+> s of total teaching experience") 
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. twoway (histogram totexpk if treated==0,color(blue%30) bin(20)) (histogram totexpk if treated==1,color(red%30) bin(20)), legend(order(1 "Non-Treated" 2 "Treate
+> d")) title("Years of total teaching experience") 
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. ttest tscore, by(treated) //significant difference in test scores
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+Class ha |   4,016    918.2251    1.141691    72.35114    915.9868    920.4634
+Class ha |   1,733    932.0508    1.835926    76.42836    928.4499    935.6516
+---------+--------------------------------------------------------------------
+Combined |   5,749    922.3928    .9742572    73.87029    920.4829    924.3027
+---------+--------------------------------------------------------------------
+    diff |           -13.82568    2.115435               -17.97273    -9.67863
+------------------------------------------------------------------------------
+    diff = mean(Class ha) - mean(Class ha)                        t =  -6.5356
+H0: diff = 0                                     Degrees of freedom =     5747
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) = 1.0000
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. help ttest
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. ttest tscore, by(treated) level(90)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [90% conf. interval]
+---------+--------------------------------------------------------------------
+Class ha |   4,016    918.2251    1.141691    72.35114    916.3468    920.1034
+Class ha |   1,733    932.0508    1.835926    76.42836    929.0293    935.0722
+---------+--------------------------------------------------------------------
+Combined |   5,749    922.3928    .9742572    73.87029      920.79    923.9955
+---------+--------------------------------------------------------------------
+    diff |           -13.82568    2.115435               -17.30582   -10.34554
+------------------------------------------------------------------------------
+    diff = mean(Class ha) - mean(Class ha)                        t =  -6.5356
+H0: diff = 0                                     Degrees of freedom =     5747
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) = 1.0000
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. ttest boy, by(treated)       // no significant difference
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+Class ha |   4,016    .5136952     .007888    .4998746    .4982305      .52916
+Class ha |   1,733    .5141373    .0120094    .4999444    .4905828    .5376918
+---------+--------------------------------------------------------------------
+Combined |   5,749    .5138285    .0065924    .4998522    .5009048    .5267521
+---------+--------------------------------------------------------------------
+    diff |           -.0004421    .0143674               -.0286077    .0277235
+------------------------------------------------------------------------------
+    diff = mean(Class ha) - mean(Class ha)                        t =  -0.0308
+H0: diff = 0                                     Degrees of freedom =     5747
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.4877         Pr(|T| > |t|) = 0.9755          Pr(T > t) = 0.5123
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. ttest tscore==1, by(treated)
+may not combine = and option by()
+r(198);
+
+end of do-file
+
+r(198);
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. ttest boy, by(treated)       // no significant difference
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+Class ha |   4,016    .5136952     .007888    .4998746    .4982305      .52916
+Class ha |   1,733    .5141373    .0120094    .4999444    .4905828    .5376918
+---------+--------------------------------------------------------------------
+Combined |   5,749    .5138285    .0065924    .4998522    .5009048    .5267521
+---------+--------------------------------------------------------------------
+    diff |           -.0004421    .0143674               -.0286077    .0277235
+------------------------------------------------------------------------------
+    diff = mean(Class ha) - mean(Class ha)                        t =  -0.0308
+H0: diff = 0                                     Degrees of freedom =     5747
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.4877         Pr(|T| > |t|) = 0.9755          Pr(T > t) = 0.5123
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. ttest freelunk, by(treated)  // no significant difference
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+Class ha |   4,016    .4870518    .0078883    .4998946    .4715864    .5025172
+Class ha |   1,733    .4731679    .0119969    .4994236    .4496379    .4966979
+---------+--------------------------------------------------------------------
+Combined |   5,749    .4828666    .0065911    .4997498    .4699456    .4957876
+---------+--------------------------------------------------------------------
+    diff |            .0138839    .0143633               -.0142737    .0420414
+------------------------------------------------------------------------------
+    diff = mean(Class ha) - mean(Class ha)                        t =   0.9666
+H0: diff = 0                                     Degrees of freedom =     5747
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.8331         Pr(|T| > |t|) = 0.3338          Pr(T > t) = 0.1669
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. ttest totexpk, by(treated)  //significant difference 
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+Class ha |   4,016    9.442978    .0911845    5.778539    9.264206     9.62175
+Class ha |   1,733    8.990767    .1376667    5.730971    8.720757    9.260778
+---------+--------------------------------------------------------------------
+Combined |   5,749    9.306662    .0760659    5.767478    9.157544     9.45578
+---------+--------------------------------------------------------------------
+    diff |            .4522106    .1656695                .1274361    .7769852
+------------------------------------------------------------------------------
+    diff = mean(Class ha) - mean(Class ha)                        t =   2.7296
+H0: diff = 0                                     Degrees of freedom =     5747
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.9968         Pr(|T| > |t|) = 0.0064          Pr(T > t) = 0.0032
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. regress tscore treated
+
+      Source |       SS           df       MS      Number of obs   =     5,749
+-------------+----------------------------------   F(1, 5747)      =     42.71
+       Model |  231405.098         1  231405.098   Prob > F        =    0.0000
+    Residual |    31134394     5,747  5417.50375   R-squared       =    0.0074
+-------------+----------------------------------   Adj R-squared   =    0.0072
+       Total |  31365799.1     5,748  5456.81961   Root MSE        =    73.604
+
+------------------------------------------------------------------------------
+     tscorek | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     treated |   13.82568   2.115435     6.54   0.000      9.67863    17.97273
+       _cons |   918.2251   1.161456   790.58   0.000     915.9482     920.502
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. outreg2 using Regression1.doc, replace ctitle(Model 1)
+Regression1.doc
+dir : seeout
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. 
+. regress tscore treated boy freelunk totexpk
+
+      Source |       SS           df       MS      Number of obs   =     5,749
+-------------+----------------------------------   F(4, 5744)      =    156.01
+       Model |  3073677.25         4  768419.314   Prob > F        =    0.0000
+    Residual |  28292121.9     5,744  4925.50868   R-squared       =    0.0980
+-------------+----------------------------------   Adj R-squared   =    0.0974
+       Total |  31365799.1     5,748  5456.81961   Root MSE        =    70.182
+
+------------------------------------------------------------------------------
+     tscorek | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+     treated |   13.82387   2.018635     6.85   0.000     9.866583    17.78115
+         boy |  -13.80328   1.853289    -7.45   0.000    -17.43643   -10.17014
+    freelunk |  -39.09762   1.857082   -21.05   0.000     -42.7382   -35.45704
+     totexpk |   1.182883   .1610983     7.34   0.000     .8670699    1.498697
+       _cons |   933.1884   2.363506   394.83   0.000      928.555    937.8218
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. outreg2 using Regression1.doc, append ctitle(Model 2)
+Regression1.doc
+dir : seeout
+
+. 
+end of do-file
+
+. do "C:\Users\Max\AppData\Local\Temp\STD3364_000000.tmp"
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\Max\Dropbox\Seminar SS22\Exercise\Exercise 1\STATA\Exercise1.log
+  log type:  text
+ closed on:   2 Jun 2022, 11:39:37
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
